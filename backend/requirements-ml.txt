@@ -1,0 +1,6 @@
+# Local-only extras for POST /api/v1/segment. Not installed in Docker or CI.
+# This installs the default PyTorch wheel (CPU on Windows). For your GPU, install
+# torch first from https://download.pytorch.org/whl/cu128, then this file.
+-r requirements-dev.txt
+torch>=2.5
+segmentation-models-pytorch>=0.4,<1.0

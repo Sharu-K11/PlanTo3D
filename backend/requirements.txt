@@ -1,0 +1,8 @@
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.34,<1.0
+pydantic>=2.9,<3.0
+pydantic-settings>=2.6,<3.0
+python-multipart>=0.0.18,<1.0
+pillow>=11.0,<14.0
+numpy>=2.0
+scalar-fastapi>=1.0,<2.0

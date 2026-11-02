@@ -1,0 +1,85 @@
+# ---------------------------------------------------------------------------
+# Secrets / environment
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Python / FastAPI (backend)
+# ---------------------------------------------------------------------------
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+pip-wheel-metadata/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.log
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Node / React / Vite (frontend)
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+.vite/
+.eslintcache
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+playwright-report/
+test-results/
+
+# ---------------------------------------------------------------------------
+# ML: training workspace, datasets, and model weights
+# ---------------------------------------------------------------------------
+model training/
+
+# Any folder named data/ (e.g. sketch_v1/data)...
+data/
+# ...but keep app source folders that happen to be named data
+!backend/**/data/
+!frontend/**/data/
+
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.onnx
+checkpoints/
+
+# Generated 3D exports
+*.glb
+*.gltf
+
+# ---------------------------------------------------------------------------
+# Editors / OS
+# ---------------------------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
