@@ -3,7 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111a17" />
+    <meta name="theme-color" content="#f7f8f2" />
+    <script>
+      // Apply the saved or system theme before first paint to avoid a light flash.
+      (function () {
+        var theme;
+        try { theme = localStorage.getItem("p2w-theme"); } catch (e) {}
+        if (theme !== "light" && theme !== "dark") {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = theme;
+        if (theme === "dark") document.querySelector('meta[name="theme-color"]').setAttribute("content", "#111613");
+      })();
+    </script>
     <meta name="description" content="Plan2World (beta): detect walls in architectural floor plans with a custom segmentation model, then review, download, or preview them in 3D." />
     <title>Plan2World | Floor plan wall segmentation (Beta)</title>
   </head>

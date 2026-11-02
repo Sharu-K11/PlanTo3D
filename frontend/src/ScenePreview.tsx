@@ -1,10 +1,40 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { useTheme, type Theme } from "./theme";
+
+const GRID_COLORS: Record<Theme, [number, number]> = { light: [0xa5afa0, 0xd2d8cd], dark: [0x4d5a50, 0x2c3530] };
+
+function makeGrid(theme: Theme) {
+  const grid = new THREE.GridHelper(16, 32, ...GRID_COLORS[theme]);
+  grid.position.y = -0.15;
+  return grid;
+}
+
+function disposeGrid(grid: THREE.GridHelper) {
+  grid.geometry.dispose();
+  if (Array.isArray(grid.material)) grid.material.forEach((material) => material.dispose());
+  else grid.material.dispose();
+}
 
 export default function ScenePreview() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const gridRef = useRef<THREE.GridHelper | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const theme = useTheme();
+
+  // Swap only the grid when the theme changes; the rest of the scene stays.
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    if (gridRef.current) {
+      scene.remove(gridRef.current);
+      disposeGrid(gridRef.current);
+    }
+    gridRef.current = makeGrid(theme);
+    scene.add(gridRef.current);
+  }, [theme]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -65,9 +95,9 @@ export default function ScenePreview() {
     addBox([1.5, 0.5, 0.8], [-1.7, 0.4, -1.7], accentMaterial);
     addBox([1, 0.35, 1.6], [2.2, 0.3, -1.35], accentMaterial);
     addBox([1.1, 0.4, 0.75], [-1, 0.35, 1], wallMaterial);
-    const grid = new THREE.GridHelper(16, 32, 0xa5afa0, 0xd2d8cd);
-    grid.position.y = -0.15;
-    scene.add(grid);
+    sceneRef.current = scene;
+    gridRef.current = makeGrid(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+    scene.add(gridRef.current);
 
     const resize = () => {
       const width = container.clientWidth;
@@ -101,9 +131,9 @@ export default function ScenePreview() {
       floorMaterial.dispose();
       wallMaterial.dispose();
       accentMaterial.dispose();
-      grid.geometry.dispose();
-      if (Array.isArray(grid.material)) grid.material.forEach((material) => material.dispose());
-      else grid.material.dispose();
+      if (gridRef.current) disposeGrid(gridRef.current);
+      gridRef.current = null;
+      sceneRef.current = null;
       renderer.dispose();
       renderer.domElement.remove();
     };

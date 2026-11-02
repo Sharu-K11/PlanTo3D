@@ -16,15 +16,16 @@ export default function ModelViewer({ data, label }: Props) {
 
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch (cause) {
       console.error("Could not initialize the 3D viewer.", cause);
       setError("3D view unavailable. Please enable WebGL in your browser.");
       return;
     }
 
+    // Transparent canvas: the themed .model-stage background shows through.
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf2f3ec);
+    renderer.setClearColor(0x000000, 0);
     const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;

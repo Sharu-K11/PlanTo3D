@@ -21,6 +21,13 @@ type Model =
 
 type View = "side" | "overlay" | "3d";
 
+const SAMPLES = [
+  { file: "sample1.png", label: "Central hall" },
+  { file: "sample2.png", label: "Courtyard" },
+  { file: "sample3.png", label: "Open core" },
+  { file: "sample4.png", label: "Corridor" },
+] as const;
+
 const VIEW_LABELS: Record<View, string> = { side: "Side by side", overlay: "Overlay", "3d": "3D model" };
 
 function formatSeconds(seconds: number): string {
@@ -100,6 +107,35 @@ export default function Workspace() {
     selectFile(event.target.files?.[0]);
     event.target.value = "";
   };
+
+  const [loadingSample, setLoadingSample] = useState<string | null>(null);
+  const loadSample = async (name: string) => {
+    setLoadingSample(name);
+    try {
+      const response = await fetch(`/samples/${name}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const blob = await response.blob();
+      selectFile(new File([blob], name, { type: "image/png" }));
+    } catch {
+      setRejection("Could not load the sample plan. Please try again.");
+    } finally {
+      setLoadingSample(null);
+    }
+  };
+
+  // Ctrl+V / Cmd+V anywhere on the page: paste a copied drawing (e.g. from Paint).
+  useEffect(() => {
+    const onPaste = (event: ClipboardEvent) => {
+      const item = [...(event.clipboardData?.items ?? [])].find((entry) => entry.kind === "file" && entry.type.startsWith("image/"));
+      const blob = item?.getAsFile();
+      if (!blob) return;
+      event.preventDefault();
+      const stamp = new Date().toISOString().slice(11, 19).replaceAll(":", "");
+      selectFile(new File([blob], `pasted-plan-${stamp}.png`, { type: blob.type }));
+    };
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
+  }, [selectFile]);
 
   const onDrop = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
@@ -203,7 +239,7 @@ export default function Workspace() {
         >
           <span className="dropzone-icon" aria-hidden="true">&#8593;</span>
           <strong>Drop a floor plan here</strong>
-          <span>or <u>browse your files</u></span>
+          <span>or <u>browse your files</u> &middot; or paste with <kbd>Ctrl</kbd>+<kbd>V</kbd></span>
           <small>PNG only &middot; up to 10 MB &middot; up to 20 megapixels</small>
         </label>
       )}
@@ -218,6 +254,66 @@ export default function Workspace() {
       />
 
       {rejection && <p className="notice error" role="alert">{rejection}</p>}
+
+      {!source && (
+        <section className="samples" aria-labelledby="samples-title">
+          <div className="samples-head">
+            <h2 id="samples-title">No plan handy? Try a sample.</h2>
+            <p>Hand-drawn style sketches like the ones the Plan2World model was trained on.</p>
+          </div>
+          <div className="samples-grid">
+            {SAMPLES.map((sample) => (
+              <button
+                key={sample.file}
+                type="button"
+                className="sample-card"
+                onClick={() => loadSample(sample.file)}
+                disabled={loadingSample !== null}
+                aria-busy={loadingSample === sample.file}
+              >
+                <img src={`/samples/thumbs/${sample.file}`} alt="" width={320} height={320} loading="lazy" />
+                <span>{loadingSample === sample.file ? "Loading…" : sample.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!source && (
+        <section className="draw-guide" aria-labelledby="draw-title">
+          <div className="draw-intro">
+            <p className="eyebrow"><span /> TRY IT YOURSELF</p>
+            <h2 id="draw-title">Sketch a plan in Paint.</h2>
+            <p>
+              No floor plan file? Draw one in under a minute with Microsoft Paint
+              or any drawing app. The model is trained on simple sketches, so a
+              rough drawing works best.
+            </p>
+          </div>
+          <ol className="draw-steps">
+            <li>
+              <strong>Open Paint</strong>
+              <span>Press <kbd>Win</kbd>, type <em>Paint</em>, and start a new white canvas.</span>
+            </li>
+            <li>
+              <strong>Draw the walls</strong>
+              <span>Use the line tool with a thick, dark brush (5px or more). Draw an outer box, then a few lines to split it into rooms.</span>
+            </li>
+            <li>
+              <strong>Copy it</strong>
+              <span>Press <kbd>Ctrl</kbd>+<kbd>A</kbd> then <kbd>Ctrl</kbd>+<kbd>C</kbd>, or save it as a PNG.</span>
+            </li>
+            <li>
+              <strong>Paste it here</strong>
+              <span>Come back and press <kbd>Ctrl</kbd>+<kbd>V</kbd>, or drop the PNG above, then click <em>Detect walls</em>.</span>
+            </li>
+          </ol>
+          <p className="draw-tip">
+            Tips: black lines on white, keep the plan roughly square, and skip text,
+            furniture, and dimensions. They are not supported in this beta.
+          </p>
+        </section>
+      )}
 
       {source && (
         <div className="workbench">
