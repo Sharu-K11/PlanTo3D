@@ -1,10 +1,14 @@
 # Plan2World
 
-**Beta — v0.0.4**
+**Beta — v0.0.4** · [GitHub repository](https://github.com/Sharu-K11/PlanTo3D)
 
-Async FastAPI + React/TypeScript foundation with an interactive Three.js home
-page and a wall-segmentation endpoint. The API has no database for now; nothing
-is stored.
+Plan2World detects walls in architectural floor plans using a custom
+segmentation model (also called Plan2World). Upload a PNG plan to get a wall
+mask you can review, download, or preview as an experimental 3D model.
+**This beta detects walls only**; doors, windows, and rooms are on the roadmap.
+
+Built with async FastAPI and React/TypeScript + Three.js. The API has no
+database; nothing is stored.
 
 The ML training scripts live in `model training/` and are not part of either
 image. Datasets (any `data/` folder) and model weights (`*.pth`, `*.pt`,

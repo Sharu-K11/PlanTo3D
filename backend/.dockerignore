@@ -4,5 +4,8 @@ __pycache__
 tests
 .env
 .env.*
-sketch_v1
-*.pth
+
+# Ignore unnecessary training files
+sketch_v1/data/
+sketch_v1/*.png
+sketch_v1/*.py

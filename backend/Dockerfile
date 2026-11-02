@@ -19,6 +19,10 @@ RUN pip install --no-cache-dir -r requirements.txt "segmentation-models-pytorch>
 
 COPY app ./app
 
+# Package trained model weights inside the Docker image
+COPY sketch_v1/checkpoints/sketch_model_v1.pth \
+    /app/sketch_v1/checkpoints/sketch_model_v1.pth
+
 # Weights are not baked in: Compose mounts ./sketch_v1/checkpoints read-only here.
 ENV SEGMENTATION_MODEL_PATH=/app/sketch_v1/checkpoints/sketch_model_v1.pth
 

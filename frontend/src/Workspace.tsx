@@ -178,9 +178,12 @@ export default function Workspace() {
           <p className="eyebrow"><span /> 02 / THE WORKSPACE</p>
           <h1 id="workspace-title" className="workspace-title">Find the <em>walls.</em></h1>
           <p className="description">
-            Upload a floor plan PNG. The segmentation model traces every wall and
-            returns a mask you can download, overlay on the original, or extrude
-            into a 3D model.
+            Upload a floor plan PNG. The Plan2World model detects the walls and
+            returns a mask you can download, overlay on the original, or preview
+            as an experimental 3D model.
+          </p>
+          <p className="beta-note">
+            <strong>Beta</strong> Walls only for now. Doors, windows, and rooms are not detected yet.
           </p>
         </div>
         <ol className="steps" aria-label="How it works">
